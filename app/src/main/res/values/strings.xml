@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Notes App</string>
+    <string name="home">Home</string>
+    <string name="recycle_bin">Recycle Bin</string>
+    <string name="settings">Settings</string>
+    <string name="search_note">Search notes</string>
+    <string name="restore">Resotre</string>
+    <string name="delete">Delete</string>
+    <string name="imagesave">Image Save</string>
+</resources>
