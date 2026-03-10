@@ -4,4 +4,18 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#0091EA</color>
     <color name="grey">#C1C5C4</color>
+    <color name="green">#00C853</color>
+    <color name="teal_200">#FDBE3B</color>
+
+
+    <color name="colorTextHint">#7B7B7B</color>
+    <color name="colorDefaultNoteColor">#333333</color>
+    <color name="colorNoteSubTitleText">#Fafafa</color>
+    <color name="colorNoteColor2">#fdbe3b</color>
+    <color name="colorNoteColor3">#E040FB</color>
+    <color name="colorNoteColor4">#3a52fc</color>
+    <color name="colorNoteColor5">#F50057</color>
+    <color name="colorNoteColor6">#00E676</color>
+    <color name="colorNoteColor7">#FF3D00</color>
+    <color name="colorDelete">#ff4842</color>
 </resources>

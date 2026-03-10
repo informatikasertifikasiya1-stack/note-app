@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+
+    <View
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="@string/app_name"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:layout_width="@dimen/_25sdp"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_margin="@dimen/_3sdp"
+        android:src="@drawable/ic_keyboard_backspace_black_24dp2"
+        app:layout_constraintBottom_toBottomOf="@id/topBar"
+        app:layout_constraintStart_toStartOf="@id/topBar"
+        app:layout_constraintTop_toTopOf="@id/topBar" />
+
+    <ImageView
+        android:id="@+id/saveBtn"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_marginEnd="@dimen/_6sdp"
+        android:background="@drawable/background_note"
+        android:backgroundTint="@color/green"
+        android:padding="@dimen/_3sdp"
+        android:src="@drawable/ic_done"
+        app:layout_constraintBottom_toBottomOf="@id/topBar"
+        app:layout_constraintEnd_toEndOf="@id/topBar"
+        app:layout_constraintTop_toTopOf="@id/topBar"
+        app:tint="@color/white" />
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/_10sdp"
+        app:layout_constraintBottom_toTopOf="@id/textOptionsView"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/llScroll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true">
+
+
+                    <EditText
+                        android:id="@+id/create_inputNoteTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_35sdp"
+                        android:layout_marginStart="@dimen/_12sdp"
+                        android:layout_marginTop="@dimen/_15sdp"
+                        android:layout_marginEnd="@dimen/_12sdp"
+                        android:background="@null"
+                        android:hint="@string/note_title"
+                        android:imeOptions="actionDone"
+                        android:importantForAutofill="no"
+                        android:includeFontPadding="false"
+                        android:inputType="text"
+                        android:textSize="@dimen/_16ssp"
+                        android:textStyle="bold"
+                        tools:ignore="MissingConstraints" />
+
+
+                    <TextView
+                        android:id="@+id/create_textDeteTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+
+                        app:layout_constraintEnd_toEndOf="@id/create_inputNoteTitle"
+                        app:layout_constraintStart_toStartOf="@id/create_inputNoteTitle"
+                        app:layout_constraintTop_toBottomOf="@id/create_inputNoteTitle" />
+
+                    <EditText
+                        android:id="@+id/create_inputNoteSubtitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_12sdp"
+                        android:layout_marginTop="@dimen/_15sdp"
+                        android:layout_marginEnd="@dimen/_12sdp"
+                        android:background="@null"
+                        android:hint="@string/note_subtitle"
+                        android:importantForAutofill="no"
+                        android:includeFontPadding="false"
+                        android:inputType="textMultiLine"
+                        android:paddingTop="@dimen/_8sdp"
+                        android:paddingBottom="@dimen/_8sdp"
+
+                        android:textSize="@dimen/_13ssp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/create_viewSubtitleIndicator"
+                        app:layout_constraintTop_toBottomOf="@id/create_textDeteTime" />
+
+
+                    <View
+                        android:id="@+id/create_viewSubtitleIndicator"
+                        android:layout_width="@dimen/_5sdp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="@dimen/_12sdp"
+                        android:background="@drawable/background_subtitle_indicr"
+                        app:layout_constraintBottom_toBottomOf="@id/create_inputNoteSubtitle"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/create_inputNoteSubtitle" />
+
+
+                    <LinearLayout
+                        android:id="@+id/create_layoutWebURL"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_12ssp"
+                        android:layout_marginTop="@dimen/_15sdp"
+                        android:layout_marginEnd="@dimen/_12ssp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:visibility="gone"
+                        app:layout_constraintTop_toBottomOf="@id/create_inputNoteSubtitle"
+                        tools:ignore="UseCompoundDrawables">
+
+                        <TextView
+                            android:id="@+id/create_textWebURL"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autoLink="web"
+                            android:includeFontPadding="false"
+                            android:textSize="@dimen/_13ssp" />
+
+                        <ImageView
+                            android:id="@+id/create_imageRemoveWebURL"
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:contentDescription="@string/todo"
+                            android:src="@drawable/ic_recycle"
+                            app:tint="@color/colorDelete" />
+
+                    </LinearLayout>
+
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/create_imageNote"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_250sdp"
+                        android:layout_marginStart="@dimen/_12ssp"
+                        android:layout_marginTop="@dimen/_12ssp"
+                        android:layout_marginEnd="@dimen/_12ssp"
+                        android:scaleType="fitStart"
+                        android:visibility="gone"
+                        app:layout_constraintTop_toBottomOf="@id/create_layoutWebURL"
+                        tools:ignore="MissingConstraints" />
+
+                    <ImageView
+                        android:id="@+id/create_imageRemoveImage"
+                        android:layout_width="@dimen/_25sdp"
+                        android:layout_height="@dimen/_25sdp"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@drawable/backround_delate"
+                        android:contentDescription="@string/todo"
+                        android:padding="@dimen/_4sdp"
+                        android:src="@drawable/ic_recycle"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="@id/create_imageNote"
+                        app:layout_constraintTop_toTopOf="@+id/create_imageNote"
+                        app:tint="@color/white" />
+
+                    <com.nazile.notesapp.presentation.NemosoftsText.NemosoftsEditText
+                        android:id="@+id/create_inputNote"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentTop="true"
+                        android:background="@android:color/transparent"
+                        android:gravity="top|start"
+                        android:hint="@string/type_note_here"
+                        android:minHeight="@dimen/_200sdp"
+                        android:paddingStart="16dp"
+                        android:paddingLeft="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingRight="16dp"
+                        android:scrollbars="vertical"
+                        app:bulletColor="@color/blue"
+                        app:bulletGapWidth="@dimen/bullet_gap_width"
+                        app:bulletRadius="@dimen/bullet_radius"
+                        app:historyEnable="true"
+                        app:historySize="99"
+                        app:layout_constraintTop_toBottomOf="@id/create_imageNote"
+                        app:linkColor="@color/blue"
+                        app:linkUnderline="true"
+                        app:quoteCapWidth="@dimen/quote_gap_width"
+                        app:quoteColor="@color/blue"
+                        app:quoteStripeWidth="@dimen/quote_stripe_width" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/adView_create"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </LinearLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!--        <include-->
+    <!--            layout="@layout/layout_mis" />-->
+
+    <HorizontalScrollView
+        android:id="@+id/textOptionsView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/grey"
+        android:scrollbars="none"
+        app:behavior_peekHeight="@dimen/_40sdp"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/bold"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/grey"
+                android:contentDescription="@null"
+                android:scaleType="center"
+
+                android:src="@drawable/ic_format_bold" />
+
+            <ImageButton
+                android:id="@+id/italic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/grey"
+                android:contentDescription="@null"
+                android:scaleType="center"
+
+                android:src="@drawable/ic_format_italic" />
+
+            <ImageButton
+                android:id="@+id/underline"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/grey"
+                android:contentDescription="@null"
+                android:scaleType="center"
+                android:src="@drawable/ic_format_underline" />
+
+            <ImageButton
+                android:id="@+id/strikethrough"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/grey"
+                android:contentDescription="@null"
+                android:scaleType="center"
+
+                android:src="@drawable/ic_format_strikethrough" />
+
+            <ImageButton
+                android:id="@+id/bullet"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/grey"
+                android:contentDescription="@null"
+                android:scaleType="center"
+
+                android:src="@drawable/ic_format_bullet" />
+
+            <ImageButton
+                android:id="@+id/quote"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/grey"
+                android:contentDescription="@null"
+                android:scaleType="center"
+
+                android:src="@drawable/ic_format_quote" />
+
+
+            <ImageButton
+                android:id="@+id/clear"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/grey"
+                android:contentDescription="@null"
+                android:scaleType="center"
+                android:src="@drawable/ic_format_clear" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

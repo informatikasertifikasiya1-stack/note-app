@@ -6,4 +6,6 @@
     </style>
 
     <style name="Theme.NotesApp" parent="Base.Theme.NotesApp" />
+
+
 </resources>
