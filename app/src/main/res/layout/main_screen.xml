@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/greyLight"
     tools:context=".presentation.ui.activities.MainActivity">
 
     <View
@@ -68,9 +68,12 @@
         android:paddingStart="0dp"
         android:paddingEnd="@dimen/_12sdp"
         android:paddingBottom="@dimen/_12sdp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/adView_main"
-        app:layout_constraintTop_toBottomOf="@id/layoutSearch" />
+        app:layout_constraintTop_toBottomOf="@id/layoutSearch"
+        app:spanCount="2"
+        tools:listitem="@layout/item_note" />
 
 
     <ImageView

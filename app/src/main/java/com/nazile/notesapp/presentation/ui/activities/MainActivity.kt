@@ -9,11 +9,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.nazile.notesapp.R
+import com.nazile.notesapp.data.models.Note
 import com.nazile.notesapp.databinding.ActivityMainBinding
 import com.nazile.notesapp.presentation.adapters.NoteAdapter
+import com.nazile.notesapp.presentation.ui.activities.createnote.CreateNoteActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -31,6 +34,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        fetchAllNotes()
         mBinding.mainScreen.imageAddNoteMain.setOnClickListener {
             startActivity(Intent(this, CreateNoteActivity::class.java))
         }
@@ -38,14 +42,26 @@ class MainActivity : AppCompatActivity() {
             mainViewModel.getNotes()
 
         }
-        setUpRecyclerView()
     }
 
-    private fun setUpRecyclerView() {
-        /*        mAdapter = NoteAdapter(this, notes = noteList, onNoteClicked = { note, pos ->
+    private fun fetchAllNotes() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            mainViewModel.getNotes().collect {
+                setUpRecyclerView(it)
+            }
+        }
+    }
 
-                })
-                mBinding.mainScreen.notesRecyclerView.layoutManager = LinearLayoutManager(this)
-                mBinding.mainScreen.notesRecyclerView.adapter = mAdapter*/
+    private suspend fun setUpRecyclerView(notes: List<Note>) {
+        withContext(Dispatchers.Main) {
+            mAdapter =
+                NoteAdapter(
+                    this@MainActivity,
+                    notes = notes as MutableList<Note>,
+                    onNoteClicked = { note, pos ->
+
+                    })
+            mBinding.mainScreen.notesRecyclerView.adapter = mAdapter
+        }
     }
 }

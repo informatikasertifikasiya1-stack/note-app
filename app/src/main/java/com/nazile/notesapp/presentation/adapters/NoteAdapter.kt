@@ -15,7 +15,6 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.nazile.notesapp.R
 import com.nazile.notesapp.data.models.Note
-import com.nazile.notesapp.data.prefs.Setting.Dark_Mode
 import com.nazile.notesapp.presentation.adapters.NoteAdapter.NoteViewHolder
 import java.util.Locale
 import java.util.Timer
@@ -56,23 +55,18 @@ class NoteAdapter(
             else -> holder.item_new.setVisibility(View.GONE)
         }
 
-        holder.textTitle.setText(note.title)
+        holder.textTitle.text = note.title
         if (note.subtitle!!.trim { it <= ' ' }.isEmpty()) {
-            holder.textSubtitle.setVisibility(View.GONE)
+            holder.textSubtitle.visibility = View.GONE
         } else {
-            holder.textSubtitle.setText(note.subtitle)
+            holder.textSubtitle.text = note.subtitle
         }
-        holder.textDateTime.setText(note.dateTime)
+        holder.textDateTime.text = note.dateTime
 
-        val gradientDrawable = holder.layoutNote.getBackground() as GradientDrawable
+        val gradientDrawable = holder.layoutNote.background as GradientDrawable
         if (note.color != null) {
             when (note.color) {
-                "#333333" -> if (Dark_Mode) {
-                    gradientDrawable.setColor(Color.parseColor("#ECECEC"))
-                    holder.textTitle.setTextColor(Color.parseColor("#161616"))
-                    holder.textSubtitle.setTextColor(Color.parseColor("#6D6D6D"))
-                    holder.textDateTime.setTextColor(Color.parseColor("#6D6D6D"))
-                } else {
+                "#333333" -> {
                     gradientDrawable.setColor(Color.parseColor("#121212"))
                     holder.textTitle.setTextColor(Color.parseColor("#DBDBDB"))
                     holder.textSubtitle.setTextColor(Color.parseColor("#E9A0A0A0"))
@@ -82,17 +76,10 @@ class NoteAdapter(
                 else -> gradientDrawable.setColor(Color.parseColor(note.color))
             }
         } else {
-            if (Dark_Mode) {
-                gradientDrawable.setColor(Color.parseColor("#ECECEC"))
-                holder.textTitle.setTextColor(Color.parseColor("#161616"))
-                holder.textSubtitle.setTextColor(Color.parseColor("#6D6D6D"))
-                holder.textDateTime.setTextColor(Color.parseColor("#6D6D6D"))
-            } else {
-                gradientDrawable.setColor(Color.parseColor("#121212"))
-                holder.textTitle.setTextColor(Color.parseColor("#DBDBDB"))
-                holder.textSubtitle.setTextColor(Color.parseColor("#E9A0A0A0"))
-                holder.textDateTime.setTextColor(Color.parseColor("#E9A0A0A0"))
-            }
+            gradientDrawable.setColor(Color.parseColor("#121212"))
+            holder.textTitle.setTextColor(Color.parseColor("#DBDBDB"))
+            holder.textSubtitle.setTextColor(Color.parseColor("#E9A0A0A0"))
+            holder.textDateTime.setTextColor(Color.parseColor("#E9A0A0A0"))
         }
 
         if (note.imagePath != null) {

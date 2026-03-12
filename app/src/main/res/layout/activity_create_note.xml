@@ -30,14 +30,10 @@
         android:layout_width="@dimen/_20sdp"
         android:layout_height="@dimen/_20sdp"
         android:layout_marginEnd="@dimen/_6sdp"
-        android:background="@drawable/background_note"
-        android:backgroundTint="@color/green"
-        android:padding="@dimen/_3sdp"
-        android:src="@drawable/ic_done"
+        android:src="@drawable/ic_checkmark"
         app:layout_constraintBottom_toBottomOf="@id/topBar"
         app:layout_constraintEnd_toEndOf="@id/topBar"
-        app:layout_constraintTop_toTopOf="@id/topBar"
-        app:tint="@color/white" />
+        app:layout_constraintTop_toTopOf="@id/topBar" />
 
 
     <androidx.core.widget.NestedScrollView
@@ -78,6 +74,8 @@
                         android:importantForAutofill="no"
                         android:includeFontPadding="false"
                         android:inputType="text"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
                         android:textSize="@dimen/_16ssp"
                         android:textStyle="bold"
                         tools:ignore="MissingConstraints" />
@@ -107,7 +105,8 @@
                         android:inputType="textMultiLine"
                         android:paddingTop="@dimen/_8sdp"
                         android:paddingBottom="@dimen/_8sdp"
-
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
                         android:textSize="@dimen/_13ssp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@id/create_viewSubtitleIndicator"
@@ -120,6 +119,7 @@
                         android:layout_height="0dp"
                         android:layout_marginStart="@dimen/_12sdp"
                         android:background="@drawable/background_subtitle_indicr"
+                        android:backgroundTint="@color/colorDefaultNoteColor"
                         app:layout_constraintBottom_toBottomOf="@id/create_inputNoteSubtitle"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@id/create_inputNoteSubtitle" />
@@ -200,6 +200,7 @@
                         android:paddingEnd="16dp"
                         android:paddingRight="16dp"
                         android:scrollbars="vertical"
+                        android:textColor="@color/black"
                         app:bulletColor="@color/blue"
                         app:bulletGapWidth="@dimen/bullet_gap_width"
                         app:bulletRadius="@dimen/bullet_radius"
@@ -232,8 +233,17 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!--        <include-->
-    <!--            layout="@layout/layout_mis" />-->
+    <!--            <include-->
+    <!--                layout="@layout/layout_mis" />-->
+    <TextView
+        android:id="@+id/textMiscellaneous"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_35sdp"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/click_here"
+        android:textSize="@dimen/_13ssp"
+        app:layout_constraintBottom_toTopOf="@+id/textOptionsView" />
 
     <HorizontalScrollView
         android:id="@+id/textOptionsView"

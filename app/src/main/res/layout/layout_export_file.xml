@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/_10sdp"
     android:background="@drawable/background_dialog"
-    android:backgroundTint="?attr/BackgroundColor_S"
+    android:backgroundTint="@color/blue"
     android:orientation="vertical">
 
     <LinearLayout
@@ -21,7 +21,7 @@
             android:layout_marginStart="@dimen/_10sdp"
             android:includeFontPadding="false"
             android:text="@string/export"
-            android:textColor="?attr/BackgroundTint"
+            android:textColor="@color/white"
             android:textSize="@dimen/_16ssp"
             android:textStyle="bold" />
 
@@ -29,14 +29,13 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="?attr/Boder" />
+        android:layout_height="1dp"
+        android:background="@color/grey" />
 
     <LinearLayout
         android:id="@+id/ll_export_image_file"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_40sdp"
-        android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="@dimen/_10sdp"
@@ -47,7 +46,7 @@
             android:layout_height="@dimen/_22sdp"
             android:contentDescription="@string/todo"
             android:src="@drawable/ic_image_file"
-            app:tint="?attr/BackgroundTint" />
+            app:tint="@color/white" />
 
         <TextView
             android:layout_width="match_parent"
@@ -55,21 +54,16 @@
             android:layout_marginStart="@dimen/_10sdp"
             android:includeFontPadding="false"
             android:text="@string/export_image_file"
-            android:textColor="?attr/BackgroundTint"
+            android:textColor="@color/white"
             android:textSize="@dimen/_12ssp" />
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="?attr/Boder" />
 
     <LinearLayout
         android:id="@+id/ll_export_txt_file"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_40sdp"
-        android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="@dimen/_10sdp"
@@ -80,7 +74,7 @@
             android:layout_height="@dimen/_22sdp"
             android:contentDescription="@string/todo"
             android:src="@drawable/ic_txt_file"
-            app:tint="?attr/BackgroundTint" />
+            app:tint="@color/white" />
 
         <TextView
             android:layout_width="match_parent"
@@ -88,15 +82,11 @@
             android:layout_marginStart="@dimen/_10sdp"
             android:includeFontPadding="false"
             android:text="@string/export_txt_file"
-            android:textColor="?attr/BackgroundTint"
+            android:textColor="@color/white"
             android:textSize="@dimen/_12ssp" />
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="?attr/Boder" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -109,7 +99,6 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="@dimen/_8sdp"
             android:layout_marginBottom="@dimen/_8sdp"
-            android:background="?attr/selectableItemBackground"
             android:includeFontPadding="false"
             android:padding="@dimen/_8sdp"
             android:text="@string/cancel"

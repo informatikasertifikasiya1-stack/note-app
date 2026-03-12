@@ -1,17 +1,17 @@
-package com.nazile.notesapp.presentation.ui.activities
+package com.nazile.notesapp.presentation.ui.activities.createnote
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.GradientDrawable
-import android.media.MediaScannerConnection
-import android.media.MediaScannerConnection.OnScanCompletedListener
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -19,26 +19,28 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
-import android.util.Log
+import android.text.Html
 import android.util.Patterns
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
-import android.view.View.OnLongClickListener
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
 import com.nazile.notesapp.R
 import com.nazile.notesapp.data.models.Note
-import com.nazile.notesapp.data.prefs.Setting.Dark_Mode
 import com.nazile.notesapp.databinding.ActivityCreateNoteBinding
 import com.nazile.notesapp.presentation.NemosoftsText.NemosoftsEditText
+import com.nazile.notesapp.presentation.ui.activities.CreateNoteViewModel
 import com.nazile.notesapp.utils.showSnackBar
+import com.nazile.notesapp.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,12 +49,11 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.Random
 
 @AndroidEntryPoint
-class CreateNoteActivity : AppCompatActivity() {
+class CreateNoteActivity : AppCompatActivity(), TextOptionsBottomSheet.TextOptionListener {
     private var setectedImagePath: String? = null
-    private var setectedNoteColor: String? = null
+    var selectedNoteColor: String? = "#424141"
     private var dialogAddURL: AlertDialog? = null
     private var dialogDeletNote: AlertDialog? = null
     private var dialogExport: AlertDialog? = null
@@ -64,7 +65,6 @@ class CreateNoteActivity : AppCompatActivity() {
         ActivityCreateNoteBinding.inflate(layoutInflater)
     }
     private val noteViewModel: CreateNoteViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -73,181 +73,56 @@ class CreateNoteActivity : AppCompatActivity() {
         setTitle(R.string.app_name)
 
 
-        mBinding.createInputNote.setSelection(mBinding.createInputNote.getEditableText().length)
+        mBinding.createInputNote.setSelection(mBinding.createInputNote.editableText.length)
 
         mBinding.createTextDeteTime.setText(
             SimpleDateFormat("EEEE , dd MMMM yyyy HH:mm a", Locale.getDefault())
                 .format(Date())
         )
 
-        setectedNoteColor = "#333333"
         setectedImagePath = ""
 
-        if (getIntent().getBooleanExtra("isViemOrUpdate", false)) {
-            alreadyAvailableNote = getIntent().getSerializableExtra("note") as Note?
+        if (intent.getBooleanExtra("isViemOrUpdate", false)) {
+            alreadyAvailableNote = intent.getSerializableExtra("note") as Note?
             setViewOrUpdateNote()
         }
 
-        findViewById<View?>(R.id.create_imageRemoveWebURL)!!.setOnClickListener(object :
-            View.OnClickListener {
-            override fun onClick(view: View?) {
-                mBinding.createTextWebURL!!.setText(null)
-                mBinding.createLayoutWebURL!!.setVisibility(View.GONE)
-            }
-        })
-
-        findViewById<View?>(R.id.create_imageRemoveImage)!!.setOnClickListener(object :
-            View.OnClickListener {
-            override fun onClick(view: View?) {
-                mBinding.createImageNote.setImageBitmap(null)
-                mBinding.createImageNote.setVisibility(View.GONE)
-                mBinding.createImageRemoveImage.setVisibility(View.GONE)
-                setectedImagePath = ""
-            }
-        })
 
 //        initMiscellaneous()
-        setSubtitleIndicatorColor()
         setClickListeners()
 
-        mBinding.bold.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                mBinding.createInputNote!!.bold(
-                    !mBinding.createInputNote!!.contains(
-                        NemosoftsEditText.FORMAT_BOLD
-                    )
-                )
-            }
-        })
-        mBinding.bold!!.setOnLongClickListener(object : OnLongClickListener {
-            override fun onLongClick(v: View?): Boolean {
-                Toast.makeText(this@CreateNoteActivity, R.string.toast_bold, Toast.LENGTH_SHORT)
-                    .show()
-                return true
-            }
-        })
-
-        mBinding.italic!!.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                mBinding.createInputNote!!.italic(
-                    !mBinding.createInputNote!!.contains(
-                        NemosoftsEditText.FORMAT_ITALIC
-                    )
-                )
-            }
-        })
-
-        mBinding.italic!!.setOnLongClickListener(object : OnLongClickListener {
-            override fun onLongClick(v: View?): Boolean {
-                Toast.makeText(this@CreateNoteActivity, R.string.toast_italic, Toast.LENGTH_SHORT)
-                    .show()
-                return true
-            }
-        })
-        mBinding.underline!!.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                mBinding.createInputNote!!.underline(
-                    !mBinding.createInputNote!!.contains(
-                        NemosoftsEditText.FORMAT_UNDERLINED
-                    )
-                )
-            }
-        })
-        mBinding.underline!!.setOnLongClickListener(object : OnLongClickListener {
-            override fun onLongClick(v: View?): Boolean {
-                Toast.makeText(
-                    this@CreateNoteActivity,
-                    R.string.toast_underline,
-                    Toast.LENGTH_SHORT
-                ).show()
-                return true
-            }
-        })
-        mBinding.strikethrough!!.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                mBinding.createInputNote!!.strikethrough(
-                    !mBinding.createInputNote!!.contains(
-                        NemosoftsEditText.FORMAT_STRIKETHROUGH
-                    )
-                )
-            }
-        })
-        mBinding.strikethrough!!.setOnLongClickListener(object : OnLongClickListener {
-            override fun onLongClick(v: View?): Boolean {
-                Toast.makeText(
-                    this@CreateNoteActivity,
-                    R.string.toast_strikethrough,
-                    Toast.LENGTH_SHORT
-                ).show()
-                return true
-            }
-        })
-
-        mBinding.bullet!!.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                mBinding.createInputNote!!.bullet(
-                    !mBinding.createInputNote!!.contains(
-                        NemosoftsEditText.FORMAT_BULLET
-                    )
-                )
-            }
-        })
-        mBinding.bullet!!.setOnLongClickListener(object : OnLongClickListener {
-            override fun onLongClick(v: View?): Boolean {
-                Toast.makeText(this@CreateNoteActivity, R.string.toast_bullet, Toast.LENGTH_SHORT)
-                    .show()
-                return true
-            }
-        })
-
-
-        mBinding.quote!!.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                mBinding.createInputNote!!.quote(
-                    !mBinding.createInputNote!!.contains(
-                        NemosoftsEditText.FORMAT_QUOTE
-                    )
-                )
-            }
-        })
-
-        mBinding.quote!!.setOnLongClickListener(object : OnLongClickListener {
-            override fun onLongClick(v: View?): Boolean {
-                Toast.makeText(this@CreateNoteActivity, R.string.toast_quote, Toast.LENGTH_SHORT)
-                    .show()
-                return true
-            }
-        })
-
-        mBinding.clear!!.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                mBinding.createInputNote!!.clearFormats()
-            }
-        })
-
-        mBinding.clear!!.setOnLongClickListener(object : OnLongClickListener {
-            override fun onLongClick(v: View?): Boolean {
-                Toast.makeText(
-                    this@CreateNoteActivity,
-                    R.string.toast_format_clear,
-                    Toast.LENGTH_SHORT
-                ).show()
-                return true
-            }
-        })
     }
 
     private fun setClickListeners() {
-        mBinding.saveBtn.setOnClickListener {
 
-            if (mBinding.createInputNote.getText().toString().trim { it <= ' ' }.isEmpty()) {
+        findViewById<View?>(R.id.create_imageRemoveWebURL)!!.setOnClickListener {
+            mBinding.createTextWebURL!!.setText(null)
+            mBinding.createLayoutWebURL!!.setVisibility(View.GONE)
+        }
+
+        findViewById<View?>(R.id.create_imageRemoveImage)!!.setOnClickListener {
+            mBinding.createImageNote.setImageBitmap(null)
+            mBinding.createImageNote.setVisibility(View.GONE)
+            mBinding.createImageRemoveImage.setVisibility(View.GONE)
+            setectedImagePath = ""
+        }
+        formattingClickListeners()
+
+        mBinding.textMiscellaneous.setOnClickListener {
+            val sheet = TextOptionsBottomSheet()
+            sheet.listener = this
+            sheet.show(supportFragmentManager, "TextOptionsSheet")
+
+        }
+        mBinding.saveBtn.setOnClickListener {
+            if (mBinding.createInputNote.text.toString().trim { it <= ' ' }.isEmpty()) {
                 showSnackBar("Note title can't be empty!", "error")
                 return@setOnClickListener
-            } else if (mBinding.createInputNoteSubtitle.getText().toString().trim { it <= ' ' }
+            } else if (mBinding.createInputNoteSubtitle.text.toString().trim { it <= ' ' }
                     .isEmpty()) {
                 showSnackBar("Note Subtitle can't be empty!", "error")
                 return@setOnClickListener
-            } else if (mBinding.createInputNote.getText().toString().trim().isEmpty()) {
+            } else if (mBinding.createInputNote.text.toString().trim().isEmpty()) {
                 showSnackBar("Note can't be empty!", "error")
                 return@setOnClickListener
             }
@@ -255,7 +130,7 @@ class CreateNoteActivity : AppCompatActivity() {
             val subTitle = mBinding.createInputNoteSubtitle.text.toString()
             val noteText = mBinding.createInputNote.toHtml()
             val dateTime = mBinding.createTextDeteTime.text.toString()
-            val noteColor = setectedNoteColor
+            val noteColor = selectedNoteColor
             val imgPath = setectedImagePath
             val webLink = mBinding.createTextWebURL.toString()
             val id = alreadyAvailableNote?.id
@@ -275,55 +150,154 @@ class CreateNoteActivity : AppCompatActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 noteViewModel.saveNote(note)
             }
+            finish()
 
 
         }
     }
 
+    private fun formattingClickListeners() {
+        mBinding.bold.setOnClickListener {
+            mBinding.createInputNote.bold(
+                mBinding.createInputNote.contains(
+                    NemosoftsEditText.FORMAT_BOLD
+                )
+            )
+        }
+        mBinding.bold.setOnLongClickListener {
+            Toast.makeText(this@CreateNoteActivity, R.string.toast_bold, Toast.LENGTH_SHORT)
+                .show()
+            true
+        }
+
+        mBinding.italic.setOnClickListener {
+            mBinding.createInputNote.italic(
+                !mBinding.createInputNote.contains(
+                    NemosoftsEditText.FORMAT_ITALIC
+                )
+            )
+        }
+
+        mBinding.italic.setOnLongClickListener {
+            Toast.makeText(this@CreateNoteActivity, R.string.toast_italic, Toast.LENGTH_SHORT)
+                .show()
+            true
+        }
+        mBinding.underline.setOnClickListener {
+            mBinding.createInputNote.underline(
+                !mBinding.createInputNote.contains(
+                    NemosoftsEditText.FORMAT_UNDERLINED
+                )
+            )
+        }
+        mBinding.underline.setOnLongClickListener {
+            Toast.makeText(
+                this@CreateNoteActivity,
+                R.string.toast_underline,
+                Toast.LENGTH_SHORT
+            ).show()
+            true
+        }
+        mBinding.strikethrough.setOnClickListener {
+            mBinding.createInputNote.strikethrough(
+                !mBinding.createInputNote.contains(
+                    NemosoftsEditText.FORMAT_STRIKETHROUGH
+                )
+            )
+        }
+        mBinding.strikethrough.setOnLongClickListener {
+            Toast.makeText(
+                this@CreateNoteActivity,
+                R.string.toast_strikethrough,
+                Toast.LENGTH_SHORT
+            ).show()
+            true
+        }
+
+        mBinding.bullet.setOnClickListener {
+            mBinding.createInputNote.bullet(
+                !mBinding.createInputNote.contains(
+                    NemosoftsEditText.FORMAT_BULLET
+                )
+            )
+        }
+        mBinding.bullet.setOnLongClickListener {
+            Toast.makeText(this@CreateNoteActivity, R.string.toast_bullet, Toast.LENGTH_SHORT)
+                .show()
+            true
+        }
+
+
+        mBinding.quote.setOnClickListener {
+            mBinding.createInputNote.quote(
+                !mBinding.createInputNote.contains(
+                    NemosoftsEditText.FORMAT_QUOTE
+                )
+            )
+        }
+
+        mBinding.quote.setOnLongClickListener {
+            Toast.makeText(this@CreateNoteActivity, R.string.toast_quote, Toast.LENGTH_SHORT)
+                .show()
+            true
+        }
+
+        mBinding.clear.setOnClickListener { mBinding.createInputNote.clearFormats() }
+
+        mBinding.clear.setOnLongClickListener {
+            Toast.makeText(
+                this@CreateNoteActivity,
+                R.string.toast_format_clear,
+                Toast.LENGTH_SHORT
+            ).show()
+            true
+        }
+    }
+
     private fun setViewOrUpdateNote() {
-        mBinding.createInputNoteTitle!!.setText(alreadyAvailableNote!!.title)
-        mBinding.createInputNoteTitle!!.setText(alreadyAvailableNote!!.subtitle)
-        mBinding.createInputNote!!.fromHtml(alreadyAvailableNote!!.noteText)
-        mBinding.createTextDeteTime!!.setText(alreadyAvailableNote!!.dateTime)
+        mBinding.createInputNoteTitle.setText(alreadyAvailableNote!!.title)
+        mBinding.createInputNoteTitle.setText(alreadyAvailableNote!!.subtitle)
+        mBinding.createInputNote.fromHtml(alreadyAvailableNote!!.noteText)
+        mBinding.createTextDeteTime.setText(alreadyAvailableNote!!.dateTime)
 
         if (alreadyAvailableNote!!.imagePath != null && !alreadyAvailableNote!!.imagePath!!.trim { it <= ' ' }
                 .isEmpty()) {
-            mBinding.createImageNote!!.setImageBitmap(BitmapFactory.decodeFile(alreadyAvailableNote!!.imagePath))
-            mBinding.createImageNote!!.setVisibility(View.VISIBLE)
+            mBinding.createImageNote.setImageBitmap(BitmapFactory.decodeFile(alreadyAvailableNote!!.imagePath))
+            mBinding.createImageNote.setVisibility(View.VISIBLE)
             findViewById<View?>(R.id.create_imageRemoveImage)!!.setVisibility(View.VISIBLE)
             setectedImagePath = alreadyAvailableNote!!.imagePath
         }
 
         if (alreadyAvailableNote!!.webLink != null && !alreadyAvailableNote!!.webLink!!.trim { it <= ' ' }
                 .isEmpty()) {
-            mBinding.createTextWebURL!!.setText(alreadyAvailableNote!!.webLink)
-            mBinding.createLayoutWebURL!!.setVisibility(View.VISIBLE)
+            mBinding.createTextWebURL.setText(alreadyAvailableNote!!.webLink)
+            mBinding.createLayoutWebURL.setVisibility(View.VISIBLE)
         }
     }
 
     private fun saveNote() {
-        if (mBinding.createInputNoteTitle!!.getText().toString().trim { it <= ' ' }.isEmpty()) {
+        if (mBinding.createInputNoteTitle.text.toString().trim { it <= ' ' }.isEmpty()) {
             this@CreateNoteActivity.showSnackBar("Note title can't be empty!", "error")
             return
-        } else if (mBinding.createInputNoteTitle.getText().toString().trim { it <= ' ' }
+        } else if (mBinding.createInputNoteTitle.text.toString().trim { it <= ' ' }
                 .isEmpty()) {
             this@CreateNoteActivity.showSnackBar("Note Subtitle can't be empty!", "error")
             return
-        } else if (mBinding.createInputNote!!.getText().toString().trim { it <= ' ' }.isEmpty()) {
+        } else if (mBinding.createInputNote.text.toString().trim { it <= ' ' }.isEmpty()) {
             this@CreateNoteActivity.showSnackBar("Note can't be empty!", "error")
             return
         }
 
         val note = Note()
-        note.title = mBinding.createInputNoteTitle!!.getText().toString()
-        note.subtitle = mBinding.createInputNoteTitle!!.getText().toString()
-        note.noteText = mBinding.createInputNote!!.toHtml()
-        note.dateTime = mBinding.createTextDeteTime!!.getText().toString()
-        note.color = setectedNoteColor
+        note.title = mBinding.createInputNoteTitle.text.toString()
+        note.subtitle = mBinding.createInputNoteTitle.text.toString()
+        note.noteText = mBinding.createInputNote.toHtml()
+        note.dateTime = mBinding.createTextDeteTime.text.toString()
+        note.color = selectedNoteColor
         note.imagePath = setectedImagePath
 
-        if (mBinding.createLayoutWebURL!!.getVisibility() == View.VISIBLE) {
-            note.webLink = mBinding.createTextWebURL!!.getText().toString()
+        if (mBinding.createLayoutWebURL.getVisibility() == View.VISIBLE) {
+            note.webLink = mBinding.createTextWebURL.getText().toString()
         }
 
         if (alreadyAvailableNote != null) {
@@ -646,123 +620,6 @@ class CreateNoteActivity : AppCompatActivity() {
           }
       }*/
 
-    private fun showExportDialog() {
-        if (dialogExport == null) {
-            val builder = AlertDialog.Builder(this@CreateNoteActivity)
-            val view = LayoutInflater.from(this).inflate(
-                R.layout.layout_export_file, findViewById<View?>(R.id.ll_layoutExport) as ViewGroup?
-            )
-            builder.setView(view)
-            dialogExport = builder.create()
-            if (dialogExport!!.getWindow() != null) {
-                dialogExport!!.getWindow()!!.setBackgroundDrawable(ColorDrawable(0))
-            }
-            view.findViewById<View?>(R.id.ll_export_image_file)!!
-                .setOnClickListener(object : View.OnClickListener {
-                    override fun onClick(view: View?) {
-                        dialogExport!!.dismiss()
-                        saveImage()
-                    }
-                })
-
-            view.findViewById<View?>(R.id.ll_export_txt_file)!!
-                .setOnClickListener(object : View.OnClickListener {
-                    override fun onClick(view: View?) {
-                        dialogExport!!.dismiss()
-                        saveResults()
-                    }
-                })
-
-            view.findViewById<View?>(R.id.textCancel)!!
-                .setOnClickListener(object : View.OnClickListener {
-                    override fun onClick(view: View?) {
-                        dialogExport!!.dismiss()
-                    }
-                })
-        }
-
-        dialogExport!!.show()
-    }
-
-    private fun saveImage() {
-        val bitmap: Bitmap
-        bitmap = viewToBitmap(mBinding.llScroll)
-        saveImageToExternalStorage(bitmap)
-    }
-
-    fun viewToBitmap(view: View): Bitmap {
-        val bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        view.draw(canvas)
-        return bitmap
-    }
-
-    private fun saveImageToExternalStorage(finalBitmap: Bitmap) {
-        val iconsStoragePath = Environment.getExternalStorageDirectory()
-            .toString() + "/" + getString(R.string.app_name)
-        val sdIconStorageDir = File(iconsStoragePath)
-        if (!sdIconStorageDir.exists()) {
-            sdIconStorageDir.mkdir()
-        }
-        generator = generatorNumber()
-        val fname = "Image_" + generator + ".jpg"
-        val file = File(sdIconStorageDir, fname)
-
-        try {
-            val out = FileOutputStream(file)
-            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-            out.flush()
-            out.close()
-            Toast.makeText(this, "Image is created!!!", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Something wrong: " + e.toString(), Toast.LENGTH_LONG).show()
-        }
-
-        // Tell the media scanner about the new file so that it is
-        // immediately available to the user.
-        MediaScannerConnection.scanFile(
-            this, arrayOf<String>(file.toString()), null,
-            object : OnScanCompletedListener {
-                override fun onScanCompleted(path: String?, uri: Uri?) {
-                    Log.i("ExternalStorage", "Scanned " + path + ":")
-                    Log.i("ExternalStorage", "-> uri=" + uri)
-                }
-            })
-
-        openGeneratedJPG()
-    }
-
-    private fun openGeneratedJPG() {
-        val iconsStoragePath = Environment.getExternalStorageDirectory()
-            .toString() + "/" + getString(R.string.app_name)
-        val sdIconStorageDir = File(iconsStoragePath)
-        if (sdIconStorageDir.exists()) {
-            val fname = "Image_" + generator + ".jpg"
-            val file = File(sdIconStorageDir, fname)
-            val intent = Intent(Intent.ACTION_VIEW)
-            val uri = Uri.fromFile(file)
-            intent.setDataAndType(uri, "image/*")
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            try {
-                startActivity(intent)
-            } catch (e: ActivityNotFoundException) {
-                Toast.makeText(
-                    this@CreateNoteActivity,
-                    "No Application available to view JPG",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
-    }
-
-    private fun generatorNumber(): Int {
-        val generator = Random()
-        var n = 10000
-        n = generator.nextInt(n)
-        return n
-    }
-
 
     private fun showDeletNoteDialog() {
         if (dialogDeletNote == null) {
@@ -817,31 +674,13 @@ class CreateNoteActivity : AppCompatActivity() {
         dialogDeletNote!!.show()
     }
 
-    private fun setSubtitleIndicatorColor() {
-        val gradientDrawable =
-            mBinding.createViewSubtitleIndicator.getBackground() as GradientDrawable
-        when (setectedNoteColor) {
-            "#333333" -> if (Dark_Mode) {
-                gradientDrawable.setColor(Color.parseColor("#ECECEC"))
-            } else {
-                gradientDrawable.setColor(Color.parseColor("#121212"))
-            }
+    private fun setSubtitleIndicatorColor(noteColor: String?) {
+        selectedNoteColor = noteColor
+        mBinding.createViewSubtitleIndicator.backgroundTintList =
+            ColorStateList.valueOf(Color.parseColor(noteColor))
 
-            else -> gradientDrawable.setColor(Color.parseColor(setectedNoteColor))
-        }
     }
 
-    private fun selectImage() {
-        val intent = Intent()
-        intent.setType("image/*")
-        intent.setAction(Intent.ACTION_GET_CONTENT)
-        startActivityForResult(
-            Intent.createChooser(
-                intent,
-                getResources().getString(R.string.select_image)
-            ), REQUST_CODE_SELECT_IMAGE
-        )
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -857,66 +696,28 @@ class CreateNoteActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUST_CODE_SELECT_IMAGE && resultCode == RESULT_OK) {
-            if (data != null) {
-                val selectedImageUri = data.getData()
-                if (selectedImageUri != null) {
-                    try {
-                        val inputStream = getContentResolver().openInputStream(selectedImageUri)
-                        val bitmap = BitmapFactory.decodeStream(inputStream)
-                        mBinding.createImageNote!!.setImageBitmap(bitmap)
-                        mBinding.createImageNote!!.setVisibility(View.VISIBLE)
-                        findViewById<View?>(R.id.create_imageRemoveImage)!!.setVisibility(View.VISIBLE)
-                        setectedImagePath = getPathFromUri(selectedImageUri)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
-    }
 
     fun getPathFromUri(uri: Uri?): String? {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                var filePath: String? = ""
-                val wholeID = DocumentsContract.getDocumentId(uri)
+            var filePath: String? = ""
+            val wholeID = DocumentsContract.getDocumentId(uri)
 
-                val id: String? =
-                    wholeID.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
-                val column = arrayOf<String?>(MediaStore.Images.Media.DATA)
-                val sel = MediaStore.Images.Media._ID + "=?"
+            val id: String? =
+                wholeID.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
+            val column = arrayOf<String?>(MediaStore.Images.Media.DATA)
+            val sel = MediaStore.Images.Media._ID + "=?"
 
-                val cursor = getContentResolver().query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    column, sel, arrayOf<String?>(id), null
-                )
+            val cursor = getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                column, sel, arrayOf<String?>(id), null
+            )
 
-                val columnIndex = cursor!!.getColumnIndex(column[0])
-                if (cursor.moveToFirst()) {
-                    filePath = cursor.getString(columnIndex)
-                }
-                cursor.close()
-                return filePath
-            } else {
-                if (uri == null) {
-                    return null
-                }
-                val projection = arrayOf<String?>(MediaStore.Images.Media.DATA)
-                val cursor = getContentResolver().query(uri, projection, null, null, null)
-                if (cursor != null) {
-                    val column_index = cursor
-                        .getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-                    cursor.moveToFirst()
-                    val retunn = cursor.getString(column_index)
-                    cursor.close()
-                    return retunn
-                }
-                return uri.getPath()
+            val columnIndex = cursor!!.getColumnIndex(column[0])
+            if (cursor.moveToFirst()) {
+                filePath = cursor.getString(columnIndex)
             }
+            cursor.close()
+            return filePath
         } catch (e: Exception) {
             e.printStackTrace()
             if (uri == null) {
@@ -937,74 +738,6 @@ class CreateNoteActivity : AppCompatActivity() {
     }
 
 
-    private fun showAddURLDialog() {
-        if (dialogAddURL == null) {
-            val builder = AlertDialog.Builder(this@CreateNoteActivity)
-            val view = LayoutInflater.from(this).inflate(
-                R.layout.layout_add_url,
-                findViewById<View?>(R.id.layoutAddUrlContiner) as ViewGroup?
-            )
-            builder.setView(view)
-
-            dialogAddURL = builder.create()
-            if (dialogAddURL!!.getWindow() != null) {
-                dialogAddURL!!.getWindow()!!.setBackgroundDrawable(ColorDrawable(0))
-            }
-
-            val inputURL = view.findViewById<EditText>(R.id.inputUrl)
-            inputURL.requestFocus()
-
-            view.findViewById<View?>(R.id.textAdd)!!
-                .setOnClickListener(object : View.OnClickListener {
-                    override fun onClick(view: View?) {
-                        if (inputURL.getText().toString().trim { it <= ' ' }.isEmpty()) {
-                            Toast.makeText(this@CreateNoteActivity, "Enter URL", Toast.LENGTH_SHORT)
-                                .show()
-                        } else if (!Patterns.WEB_URL.matcher(inputURL.getText().toString())
-                                .matches()
-                        ) {
-                            Toast.makeText(
-                                this@CreateNoteActivity,
-                                "Enter Valid URL",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            mBinding.createTextWebURL!!.setText(inputURL.getText().toString())
-                            mBinding.createLayoutWebURL!!.setVisibility(View.VISIBLE)
-                            dialogAddURL!!.dismiss()
-                        }
-                    }
-                })
-
-            view.findViewById<View?>(R.id.textCancel)!!
-                .setOnClickListener(object : View.OnClickListener {
-                    override fun onClick(view: View?) {
-                        dialogAddURL!!.dismiss()
-                    }
-                })
-        }
-        dialogAddURL!!.show()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        getMenuInflater().inflate(R.menu.menu_seve, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.getItemId()
-
-        //        switch (id){
-//            case R.id.imageSave :
-//                saveNote();
-//                break;
-//        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun deleteSaveNote() {
         if (mBinding.createInputNoteTitle!!.getText().toString().trim { it <= ' ' }.isEmpty()) {
             this@CreateNoteActivity.showSnackBar("Note title can't be empty!", "error")
@@ -1023,7 +756,7 @@ class CreateNoteActivity : AppCompatActivity() {
         note.subtitle = mBinding.createInputNoteSubtitle.getText().toString()
         note.noteText = mBinding.createInputNote!!.toHtml()
         note.dateTime = mBinding.createTextDeteTime.getText().toString()
-        note.color = setectedNoteColor
+        note.color = selectedNoteColor
         note.imagePath = setectedImagePath
 
         if (mBinding.createLayoutWebURL.getVisibility() == View.VISIBLE) {
@@ -1072,7 +805,7 @@ class CreateNoteActivity : AppCompatActivity() {
         note.subtitle = mBinding.createInputNoteSubtitle!!.getText().toString()
         note.noteText = mBinding.createInputNote!!.toHtml()
         note.dateTime = mBinding.createTextDeteTime!!.getText().toString()
-        note.color = setectedNoteColor
+        note.color = selectedNoteColor
         note.imagePath = setectedImagePath
 
         if (mBinding.createTextWebURL!!.getVisibility() == View.VISIBLE) {
@@ -1096,52 +829,334 @@ class CreateNoteActivity : AppCompatActivity() {
         SaveNoteTask().execute()
     }
 
-    fun saveResults() {
-        var textNote = " "
-        var textTitle = " "
-        var textSubtitle = " "
 
-        if (!mBinding.createInputNote!!.getText().toString().isEmpty()) {
-            textNote = mBinding.createInputNote!!.getText().toString()
-        }
-        if (!mBinding.createInputNoteTitle!!.getText().toString().isEmpty()) {
-            textTitle = mBinding.createInputNoteTitle!!.getText().toString()
-        }
-        if (!mBinding.createInputNoteSubtitle!!.getText().toString().isEmpty()) {
-            textSubtitle = mBinding.createInputNoteSubtitle!!.getText().toString()
+    override fun onSelectedColor(color: String?) {
+        selectedNoteColor = color
+        setSubtitleIndicatorColor(selectedNoteColor)
+    }
+
+    val pickImage =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                try {
+
+                    mBinding.createImageNote.setImageURI(uri)
+                    mBinding.createImageNote.visibility = View.VISIBLE
+                    findViewById<View?>(R.id.create_imageRemoveImage)?.visibility = View.VISIBLE
+                    setectedImagePath = uri.path
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                }
+//                    imageView.setImageURI(uri)
+            }
         }
 
-        val text = (textTitle + "\n"
-                + "\n"
-                + textSubtitle + "\n"
-                + "\n"
-                + textNote)
+    override fun onAddImage() {
+        pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    }
 
-        val iconsStoragePath = Environment.getExternalStorageDirectory()
-            .toString() + "/" + getString(R.string.app_name)
-        val sdIconStorageDir = File(iconsStoragePath)
-        if (!sdIconStorageDir.exists()) {
-            sdIconStorageDir.mkdir()
+    override fun onAddUrl() {
+        showAddURLDialog()
+    }
+
+    override fun onExportNote() {
+        showExportDialog()
+    }
+
+    override fun onShareNote() {
+        shareNote()
+    }
+
+    /**   export file methods **/
+    private fun showExportDialog() {
+        if (dialogExport == null) {
+            val builder = AlertDialog.Builder(this@CreateNoteActivity)
+            val view = LayoutInflater.from(this).inflate(
+                R.layout.layout_export_file, findViewById<View?>(R.id.ll_layoutExport) as ViewGroup?
+            )
+            builder.setView(view)
+            dialogExport = builder.create()
+            if (dialogExport?.window != null) {
+                dialogExport?.window!!.setBackgroundDrawable(0.toDrawable())
+            }
+            view.findViewById<View?>(R.id.ll_export_image_file)!!
+                .setOnClickListener {
+                    dialogExport!!.dismiss()
+                    saveImage()
+                }
+
+            view.findViewById<View?>(R.id.ll_export_txt_file)!!
+                .setOnClickListener {
+                    dialogExport?.dismiss()
+                    saveResults()
+                }
+
+            view.findViewById<View?>(R.id.textCancel)!!
+                .setOnClickListener { dialogExport!!.dismiss() }
         }
-        generator = generatorNumber()
-        val fname = "notes_" + generator + ".txt"
-        val file = File(sdIconStorageDir, fname)
+
+        dialogExport?.show()
+    }
+
+    private fun saveImage() {
+        val bitmap: Bitmap = viewToBitmap(mBinding.llScroll)
+        saveImageToDownloads(bitmap)
+    }
+
+    private fun saveImageToDownloads(bitmap: Bitmap) {
+
+        val resolver = contentResolver
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, "Image_${System.currentTimeMillis()}.jpg")
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            put(
+                MediaStore.MediaColumns.RELATIVE_PATH,
+                Environment.DIRECTORY_PICTURES + "/" + getString(R.string.app_name)
+            )
+        }
+
+        val imageUri = resolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
+
+        imageUri?.let { uri ->
+
+            resolver.openOutputStream(uri)?.use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            }
+            openGeneratedJPG(uri)
+            Toast.makeText(this, "Image saved to Downloads", Toast.LENGTH_SHORT).show()
+
+        } ?: run {
+            Toast.makeText(this, "Failed to save image", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun viewToBitmap(view: View): Bitmap {
+        val bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        view.draw(canvas)
+        return bitmap
+    }
+
+    private fun openGeneratedJPG(uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "image/*")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
 
         try {
-            val out = FileOutputStream(file)
-            out.write(text.toByteArray())
-            mBinding.createInputNote!!.getText().clear()
-            out.flush()
-            out.close()
-            Toast.makeText(this, "txt is created!!!", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Something wrong: " + e.toString(), Toast.LENGTH_LONG).show()
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(
+                this,
+                "No application available to view image",
+                Toast.LENGTH_LONG
+            ).show()
         }
+    }
+
+    fun saveResults() {
+        val textTitle = mBinding.createInputNoteTitle.text.toString()
+        val textSubtitle = mBinding.createInputNoteSubtitle.text.toString()
+        val textNote = mBinding.createInputNote.text.toString()
+
+        val text = """
+        $textTitle
+        
+        $textSubtitle
+        
+        $textNote
+    """.trimIndent()
+
+        val fileName = "notes_${System.currentTimeMillis()}.txt"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+            // Android 10+
+            val resolver = contentResolver
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                put(MediaStore.MediaColumns.MIME_TYPE, "text/plain")
+                put(
+                    MediaStore.MediaColumns.RELATIVE_PATH,
+                    Environment.DIRECTORY_DOWNLOADS + "/" + getString(R.string.app_name)
+                )
+            }
+
+            val uri = resolver.insert(
+                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                contentValues
+            )
+
+            uri?.let {
+                resolver.openOutputStream(it)?.use { outputStream ->
+                    outputStream.write(text.toByteArray())
+                }
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "text/plain")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                startActivity(intent)
+                Toast.makeText(this, "File saved to Downloads", Toast.LENGTH_SHORT).show()
+            }
+
+        } else {
+
+            // Android 9 and below
+            val path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS
+            ).toString() + "/" + getString(R.string.app_name)
+
+            val dir = File(path)
+            if (!dir.exists()) dir.mkdirs()
+
+            val file = File(dir, fileName)
+
+            try {
+                val out = FileOutputStream(file)
+                out.write(text.toByteArray())
+                out.flush()
+                out.close()
+
+                Toast.makeText(this, "File saved to Downloads", Toast.LENGTH_SHORT).show()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    /**   export file methods ends **/
+    private fun shareNote() {
+        if (mBinding.createInputNoteTitle.text.toString().trim { it <= ' ' }.isEmpty()) {
+            this@CreateNoteActivity.showSnackBar("Note title can't be empty!", "error")
+        } else if (mBinding.createInputNote.text.toString().trim { it <= ' ' }
+                .isEmpty()) {
+            this@CreateNoteActivity.showSnackBar("Note can't be empty!", "error")
+        } else {
+            val sendIntent = Intent()
+            sendIntent.action = Intent.ACTION_SEND
+            sendIntent.putExtra(
+                Intent.EXTRA_TEXT,
+                mBinding.createInputNoteTitle.text.toString() + "\n\n" +
+                        mBinding.createTextDeteTime.text.toString() + "\n\n" +
+                        mBinding.createInputNoteSubtitle.text.toString() + "\n\n" +
+                        Html.fromHtml(mBinding.createInputNote.toHtml()) + "\n" +
+                        "https://play.google.com/store/apps/details?id=" + packageName
+            )
+            sendIntent.type = "text/plain"
+            startActivity(sendIntent)
+        }
+    }
+
+    /**   Add URL methods **/
+    private fun showAddURLDialog() {
+        if (dialogAddURL == null) {
+            val builder = AlertDialog.Builder(this@CreateNoteActivity)
+            val view = LayoutInflater.from(this).inflate(
+                R.layout.layout_add_url,
+                findViewById<View?>(R.id.layoutAddUrlContiner) as ViewGroup?
+            )
+            builder.setView(view)
+
+            dialogAddURL = builder.create()
+            if (dialogAddURL?.window != null) {
+                dialogAddURL?.window?.setBackgroundDrawable(0.toDrawable())
+            }
+
+            val inputURL = view.findViewById<EditText>(R.id.inputUrl)
+            inputURL.requestFocus()
+
+            view.findViewById<View?>(R.id.textAdd)
+                ?.setOnClickListener {
+                    if (inputURL.text.toString().trim { it <= ' ' }.isEmpty()) {
+                        this@CreateNoteActivity.toast("Enter URL")
+                    } else if (!Patterns.WEB_URL.matcher(inputURL.text.toString())
+                            .matches()
+                    ) {
+                        this@CreateNoteActivity.toast("Enter Valid URL")
+                    } else {
+                        mBinding.createTextWebURL.text = inputURL.text.toString()
+                        mBinding.createLayoutWebURL.visibility = View.VISIBLE
+                        dialogAddURL!!.dismiss()
+                    }
+                }
+
+            view.findViewById<View?>(R.id.textCancel)!!
+                .setOnClickListener { dialogAddURL?.dismiss() }
+        }
+        dialogAddURL?.show()
     }
 
     companion object {
         private const val REQUST_CODE_STORAGE_PERMISSION = 1
         private const val REQUST_CODE_SELECT_IMAGE = 2
+    }
+
+    private val storagePermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+
+            val granted = permissions.entries.all { it.value }
+
+            if (granted) {
+//                openImagePicker()
+            } else {
+                Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    fun requestStoragePermission() {
+
+        val permissions = when {
+
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+            }
+
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+
+            else -> {
+                arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            }
+        }
+
+        storagePermissionLauncher.launch(permissions)
+    }
+
+    fun hasStoragePermission(): Boolean {
+
+        return when {
+
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_MEDIA_IMAGES
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+
+            else -> {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+        }
     }
 }

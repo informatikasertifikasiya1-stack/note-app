@@ -7,17 +7,14 @@
     android:layout_height="wrap_content"
     android:background="@drawable/background_mis"
     android:orientation="vertical"
+    android:backgroundTint="@color/white"
     app:behavior_peekHeight="@dimen/_75sdp"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
-    <TextView
+    <View
         android:id="@+id/textMiscellaneous"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_35sdp"
-        android:gravity="center"
-        android:includeFontPadding="false"
-        android:text="@string/click_here"
-        android:textSize="@dimen/_13ssp" />
+        android:layout_height="@dimen/_35sdp" />
 
 
     <LinearLayout
@@ -47,7 +44,7 @@
                 android:contentDescription="@string/todo"
                 android:padding="@dimen/_10sdp"
                 android:src="@drawable/ic_done"
-                app:tint="@color/grey" />
+                app:tint="@color/white" />
 
         </FrameLayout>
 
@@ -193,13 +190,14 @@
             android:layout_height="@dimen/_22sdp"
             android:contentDescription="@string/todo"
             android:src="@drawable/ic_add_image"
-            app:tint="@color/white" />
+            app:tint="@color/black" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_10sdp"
             android:includeFontPadding="false"
+            android:textColor="@color/black"
             android:text="@string/add_image"
             android:textSize="@dimen/_12ssp" />
 
@@ -221,13 +219,14 @@
             android:layout_height="@dimen/_22sdp"
             android:contentDescription="@string/todo"
             android:src="@drawable/ic_web"
-            app:tint="@color/white" />
+            app:tint="@color/black" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_10sdp"
             android:includeFontPadding="false"
+            android:textColor="@color/black"
             android:text="@string/add_url"
             android:textSize="@dimen/_12ssp" />
 
@@ -249,7 +248,7 @@
             android:layout_height="@dimen/_22sdp"
             android:contentDescription="@string/todo"
             android:src="@drawable/ic_export_file"
-            app:tint="@color/white" />
+            app:tint="@color/black" />
 
         <TextView
             android:layout_width="match_parent"
@@ -257,6 +256,7 @@
             android:layout_marginStart="@dimen/_10sdp"
             android:includeFontPadding="false"
             android:text="@string/export"
+            android:textColor="@color/black"
             android:textSize="@dimen/_12ssp" />
 
     </LinearLayout>
@@ -277,7 +277,7 @@
             android:layout_height="@dimen/_22sdp"
             android:contentDescription="@string/todo"
             android:src="@drawable/ic_share"
-            app:tint="@color/white" />
+            app:tint="@color/black" />
 
         <TextView
             android:layout_width="match_parent"
@@ -285,6 +285,7 @@
             android:layout_marginStart="@dimen/_10sdp"
             android:includeFontPadding="false"
             android:text="@string/share"
+            android:textColor="@color/black"
             android:textSize="@dimen/_12ssp" />
 
     </LinearLayout>
