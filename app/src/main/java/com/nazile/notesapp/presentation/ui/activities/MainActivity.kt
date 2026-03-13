@@ -13,6 +13,8 @@ import com.nazile.notesapp.data.models.Note
 import com.nazile.notesapp.databinding.ActivityMainBinding
 import com.nazile.notesapp.presentation.adapters.NoteAdapter
 import com.nazile.notesapp.presentation.ui.activities.createnote.CreateNoteActivity
+import com.nazile.notesapp.utils.openUrl
+import com.nazile.notesapp.utils.shareApp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,18 +31,62 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(mBinding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.drawer_layout)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(mBinding.mainScreen.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
         fetchAllNotes()
+        setClickListeners()
+        setDrawerListeners()
+
+    }
+
+    private fun setDrawerListeners() {
+        mBinding.navView.setNavigationItemSelectedListener { menuItem ->
+
+            when (menuItem.itemId) {
+                R.id.homeItem -> {
+                    mBinding.drawerLayout.close()
+                }
+
+                R.id.shareItem -> {
+                    shareApp()
+                }
+
+                R.id.privacyItem -> {
+                    openUrl("https://ww.google.com")
+                }
+            }
+
+            // Close the drawer after selection
+            mBinding.drawerLayout.close()
+            true
+        }
+
+    }
+
+    private fun setClickListeners() {
+
+
+        /*    // Delete Action
+            mBinding.mainScreen.deleteImg.setOnClickListener {
+                val selectedNotes = mAdapter?.getSelectedNotes()
+                if (!selectedNotes.isNullOrEmpty()) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        // Assuming your ViewModel has a delete function
+                        mainViewModel.deleteNotes(selectedNotes)
+                        mAdapter?.exitSelectionMode()
+                    }
+                }
+            }*/
+
+
+        mBinding.mainScreen.drawerBtn.setOnClickListener {
+            mBinding.drawerLayout.open()
+        }
         mBinding.mainScreen.imageAddNoteMain.setOnClickListener {
             startActivity(Intent(this, CreateNoteActivity::class.java))
-        }
-        lifecycleScope.launch(Dispatchers.IO) {
-            mainViewModel.getNotes()
-
         }
     }
 
@@ -59,7 +105,10 @@ class MainActivity : AppCompatActivity() {
                     this@MainActivity,
                     notes = notes as MutableList<Note>,
                     onNoteClicked = { note, pos ->
-
+                        val intent = Intent(applicationContext, CreateNoteActivity::class.java)
+                        intent.putExtra("isViemOrUpdate", true)
+                        intent.putExtra("note", note)
+                        startActivity(intent)
                     })
             mBinding.mainScreen.notesRecyclerView.adapter = mAdapter
         }

@@ -16,4 +16,12 @@ class MainViewModel @Inject constructor(
         return repository.getNotes()
 
     }
+
+    suspend fun deleteNote(note: Note) {
+        repository.deleteNote(note)
+    }
+
+    suspend fun deleteNotes(note: List<Note>) {
+        repository.deleteMultipleNotes(note)
+    }
 }

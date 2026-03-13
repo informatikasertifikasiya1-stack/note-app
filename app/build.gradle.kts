@@ -68,4 +68,5 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.57.1")
     ksp("com.google.dagger:hilt-compiler:2.57.1")
     // Hilt compiler (annotation processor)
+    implementation("io.coil-kt:coil:2.6.0")
 }

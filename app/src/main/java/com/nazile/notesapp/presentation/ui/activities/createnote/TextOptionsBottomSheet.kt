@@ -17,6 +17,7 @@ class TextOptionsBottomSheet() : BottomSheetDialogFragment() {
         fun onAddUrl()
         fun onExportNote()
         fun onShareNote()
+        fun onDeleteNote()
     }
 
     var listener: TextOptionListener? = null
@@ -46,6 +47,9 @@ class TextOptionsBottomSheet() : BottomSheetDialogFragment() {
             }
             layoutShareNote.setOnClickListener {
                 listener?.onShareNote()
+            }
+            layoutDeleteNote.setOnClickListener {
+                listener?.onDeleteNote()
             }
 
         }

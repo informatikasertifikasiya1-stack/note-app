@@ -2,6 +2,7 @@ package com.nazile.notesapp.data.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
@@ -31,9 +32,8 @@ data class Note(
     @ColumnInfo(name = "web_link")
     var webLink: String? = null,
 
-    ) : Serializable
-
-//override fun toString(): String {
-//    return title + " : " + dateTime
-//}
+    ) : Serializable {
+    @Ignore // Room will ignore this field
+    var isSelected: Boolean = false
+}
 

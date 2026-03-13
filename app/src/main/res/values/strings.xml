@@ -72,7 +72,7 @@
     <string name="this_app_privacy_policy">This app privacy policy</string>
     <string name="rate_the_app">Rate the app</string>
     <string name="love_this_app">Love this app? Let us Know in the Google Play Store how we can make it even better</string>
-    <string name="share_the_app">Share the app with your friends and family</string>
+    <string name="share_the_app">Share App</string>
     <string name="language">Language</string>
     <string name="high_security">High security</string>
     <string name="toast_bold">Bold</string>
@@ -82,4 +82,6 @@
     <string name="are_you_sure_you_want_to_delete_this_note">Are you sure you want to delete this note?</string>
     <string name="move_to_recycle_bin">Move to recycle bin</string>
     <string name="are_you_sure_you_want_to_move_to_recycle_bin_this_note">Are you sure you want to move this note to recyclebin?</string>
+    <string name="new_str">NEW</string>
+    <string name="my_notes">My Notes</string>
 </resources>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_layoutNote"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,18 +18,28 @@
         android:includeFontPadding="false"
         android:paddingStart="@dimen/_3sdp"
         android:paddingEnd="@dimen/_3sdp"
-        android:text="NEW"
+        android:text="@string/new_str"
         android:textColor="@color/white"
         android:textSize="@dimen/_10ssp"
         android:textStyle="bold"
         android:translationZ="2dp" />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <!--    <androidx.appcompat.widget.AppCompatImageView-->
+    <!--        android:layout_marginTop="@dimen/_3sdp"-->
+    <!--        android:id="@+id/item_imageNote"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="@dimen/_90sdp"-->
+    <!--        android:adjustViewBounds="true"-->
+    <!--        android:scaleType="fitXY"-->
+    <!--        android:visibility="gone" />-->
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/item_imageNote"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/_90sdp"
         android:adjustViewBounds="true"
-        android:visibility="gone" />
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:shapeAppearanceOverlay="@style/RoundedImageView" />
 
     <TextView
         android:id="@+id/item_textTitlem"

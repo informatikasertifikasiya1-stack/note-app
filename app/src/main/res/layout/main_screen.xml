@@ -2,20 +2,32 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/greyLight"
+    android:background="@color/white"
     tools:context=".presentation.ui.activities.MainActivity">
 
     <View
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_40sdp"
-        app:title="@string/app_name"
-        app:titleTextColor="?attr/BackgroundTint"
-        tools:ignore="MissingConstraints" />
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="@string/app_name" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/my_notes"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@id/toolbar"
+        app:layout_constraintEnd_toEndOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="@id/toolbar"
+        app:layout_constraintTop_toTopOf="@id/toolbar" />
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/drawerBtn"
         android:layout_width="@dimen/_32sdp"
         android:layout_height="@dimen/_32sdp"
         android:layout_marginStart="@dimen/_5sdp"
@@ -36,6 +48,7 @@
         android:orientation="horizontal"
         android:paddingStart="@dimen/_10sdp"
         android:paddingEnd="@dimen/_10sdp"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -70,8 +83,7 @@
         android:paddingBottom="@dimen/_12sdp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/adView_main"
-        app:layout_constraintTop_toBottomOf="@id/layoutSearch"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:spanCount="2"
         tools:listitem="@layout/item_note" />
 
@@ -86,19 +98,9 @@
         android:contentDescription="@string/app_name"
         android:padding="@dimen/_5sdp"
         android:src="@drawable/ic_add"
-        app:layout_constraintBottom_toTopOf="@+id/adView_main"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:tint="@color/white" />
-
-
-    <LinearLayout
-        android:id="@+id/adView_main"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

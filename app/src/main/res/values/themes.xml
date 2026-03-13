@@ -7,5 +7,7 @@
 
     <style name="Theme.NotesApp" parent="Base.Theme.NotesApp" />
 
-
+    <style name="RoundedImageView">
+        <item name="cornerSize">12dp</item>
+    </style>
 </resources>

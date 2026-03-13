@@ -6,18 +6,19 @@
     <group android:checkableBehavior="single">
 
         <item
+            android:id="@+id/homeItem"
             android:icon="@drawable/ic_home"
             android:title="@string/home" />
 
         <item
-            android:id="@+id/nav_delete"
-            android:icon="@drawable/ic_recycle"
-            android:title="@string/recycle_bin" />
+            android:id="@+id/shareItem"
+            android:icon="@drawable/ic_share"
+            android:title="@string/share_the_app" />
 
         <item
-            android:id="@+id/action_set"
-            android:icon="@drawable/ic_setting"
-            android:title="@string/settings" />
+            android:id="@+id/privacyItem"
+            android:icon="@drawable/ic_privacy"
+            android:title="@string/privacy_policy" />
 
 
     </group>

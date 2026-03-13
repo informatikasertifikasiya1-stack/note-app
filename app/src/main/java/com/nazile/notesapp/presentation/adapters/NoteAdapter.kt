@@ -1,7 +1,6 @@
 package com.nazile.notesapp.presentation.adapters
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Handler
@@ -13,6 +12,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.nazile.notesapp.R
 import com.nazile.notesapp.data.models.Note
 import com.nazile.notesapp.presentation.adapters.NoteAdapter.NoteViewHolder
@@ -25,22 +25,53 @@ class NoteAdapter(
     private var notes: MutableList<Note>,
     val onNoteClicked: (Note, Int) -> Unit
 ) : RecyclerView.Adapter<NoteViewHolder>() {
+    var isSelectionMode = false
     private var timer: Timer? = null
     private val noteSource: MutableList<Note> = notes
 
+    class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var textTitle: TextView
+        var textSubtitle: TextView
+        var textDateTime: TextView
+        var item_new: TextView
+        var layoutNote: RelativeLayout
+        var imageNote: AppCompatImageView
+
+
+        init {
+            item_new = itemView.findViewById(R.id.item_new)
+            textTitle = itemView.findViewById(R.id.item_textTitlem)
+            textSubtitle = itemView.findViewById(R.id.item_textSubTitle)
+            textDateTime = itemView.findViewById(R.id.item_textDateTime)
+            layoutNote = itemView.findViewById(R.id.item_layoutNote)
+            imageNote = itemView.findViewById(R.id.item_imageNote)
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val itemView =
-            LayoutInflater.from(parent.getContext()).inflate(R.layout.item_note, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.item_note, parent, false)
         return NoteViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         val note = notes.get(position)
-        holder.layoutNote.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(view: View?) {
-                onNoteClicked(notes.get(position), position)
-            }
-        })
+        // Show/Hide checkmark based on selection
+
+        // Visual feedback for selection (optional: change alpha or background)
+        holder.layoutNote.alpha = if (isSelectionMode && !note.isSelected) 0.5f else 1.0f
+
+        holder.layoutNote.setOnClickListener {
+            onNoteClicked(note, position)
+        }
+
+
+        holder.layoutNote.setOnClickListener {
+            onNoteClicked(notes.get(position), position)
+        }
+        holder.layoutNote.setOnLongClickListener {
+            true
+        }
         var step = 1
         var final_step = 1
         for (i in 1..<position + 1) {
@@ -51,8 +82,8 @@ class NoteAdapter(
         }
 
         when (step) {
-            1 -> holder.item_new.setVisibility(View.VISIBLE)
-            else -> holder.item_new.setVisibility(View.GONE)
+            1 -> holder.item_new.visibility = View.VISIBLE
+            else -> holder.item_new.visibility = View.GONE
         }
 
         holder.textTitle.text = note.title
@@ -83,10 +114,13 @@ class NoteAdapter(
         }
 
         if (note.imagePath != null) {
-            holder.imageNote.setImageBitmap(BitmapFactory.decodeFile(note.imagePath))
-            holder.imageNote.setVisibility(View.VISIBLE)
+            holder.imageNote.load(note.imagePath) {
+                crossfade(true)
+            }
+//            holder.imageNote.setImageBitmap(BitmapFactory.decodeFile(note.imagePath))
+            holder.imageNote.visibility = View.VISIBLE
         } else {
-            holder.imageNote.setVisibility(View.GONE)
+            holder.imageNote.visibility = View.GONE
         }
     }
 
@@ -98,24 +132,9 @@ class NoteAdapter(
         return position
     }
 
-    class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var textTitle: TextView
-        var textSubtitle: TextView
-        var textDateTime: TextView
-        var item_new: TextView
-        var layoutNote: RelativeLayout
-        var imageNote: AppCompatImageView
 
+    fun getSelectedNotes(): List<Note> = notes.filter { it.isSelected }
 
-        init {
-            item_new = itemView.findViewById<TextView>(R.id.item_new)
-            textTitle = itemView.findViewById<TextView>(R.id.item_textTitlem)
-            textSubtitle = itemView.findViewById<TextView>(R.id.item_textSubTitle)
-            textDateTime = itemView.findViewById<TextView>(R.id.item_textDateTime)
-            layoutNote = itemView.findViewById<RelativeLayout>(R.id.item_layoutNote)
-            imageNote = itemView.findViewById<AppCompatImageView>(R.id.item_imageNote)
-        }
-    }
 
     fun searchNote(searchKeyword: String) {
         timer = Timer()
@@ -148,11 +167,7 @@ class NoteAdapter(
                     notes = temp
                 }
 
-                Handler(Looper.getMainLooper()).post(object : Runnable {
-                    override fun run() {
-                        notifyDataSetChanged()
-                    }
-                })
+                Handler(Looper.getMainLooper()).post { notifyDataSetChanged() }
             }
         }, 500)
     }

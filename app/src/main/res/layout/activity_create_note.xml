@@ -17,6 +17,7 @@
         tools:ignore="MissingConstraints" />
 
     <ImageView
+        android:id="@+id/backImg"
         android:layout_width="@dimen/_25sdp"
         android:layout_height="@dimen/_25sdp"
         android:layout_margin="@dimen/_3sdp"
@@ -222,8 +223,6 @@
                 android:id="@+id/adView_create"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
                 android:orientation="vertical"
                 android:paddingTop="@dimen/_10sdp"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -233,17 +232,34 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!--            <include-->
-    <!--                layout="@layout/layout_mis" />-->
+    <View
+        android:id="@+id/bottomSheetView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        app:layout_constraintBottom_toTopOf="@+id/textOptionsView" />
+
     <TextView
         android:id="@+id/textMiscellaneous"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/_35sdp"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_30sdp"
         android:gravity="center"
         android:includeFontPadding="false"
         android:text="@string/click_here"
         android:textSize="@dimen/_13ssp"
-        app:layout_constraintBottom_toTopOf="@+id/textOptionsView" />
+        app:layout_constraintBottom_toTopOf="@+id/textOptionsView"
+        app:layout_constraintEnd_toEndOf="@id/bottomSheetView"
+        app:layout_constraintStart_toStartOf="@+id/bottomSheetView" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_up"
+        app:layout_constraintBottom_toBottomOf="@id/bottomSheetView"
+        app:layout_constraintEnd_toEndOf="@id/bottomSheetView"
+        app:layout_constraintHorizontal_bias="0.7"
+        app:layout_constraintStart_toStartOf="@+id/bottomSheetView"
+        app:layout_constraintTop_toTopOf="@id/bottomSheetView"
+        app:tint="@color/black" />
 
     <HorizontalScrollView
         android:id="@+id/textOptionsView"
