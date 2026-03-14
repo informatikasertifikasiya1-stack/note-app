@@ -29,11 +29,11 @@ locally on your device.
 
 |                Home Screen                |                  Note Editor                  |              Rich Text Editing              |
 |:-----------------------------------------:|:---------------------------------------------:|:-------------------------------------------:|
-| <img src="screen1_home.png" width="200"/> | <img src="screen5_new_note.png" width="200"/> | <img src="screen2_editor.png" width="200"/> |
+| <img src="screenshots/screen1_home.png" width="200"/> | <img src="screenshots/screen5_new_note.png" width="200"/> | <img src="screenshots/screen2_editor.png" width="200"/> |
 
 |                Color Picker                 |               Export Options                |
 |:-------------------------------------------:|:-------------------------------------------:|
-| <img src="screen4_colors.png" width="200"/> | <img src="screen3_export.png" width="200"/> |
+| <img src="screenshots/screen4_colors.png" width="200"/> | <img src="screenshots/screen3_export.png" width="200"/> |
 
 </div>
 
